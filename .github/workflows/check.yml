@@ -1,0 +1,35 @@
+name: Stick Nodes Tracker
+on:
+  schedule:
+    - cron: '0 0 */2 * *' # Runs every 2 days at midnight
+  workflow_dispatch:      # Allows you to click "Run workflow" manually
+
+jobs:
+  check-versions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 cloudscraper
+        
+      - name: Run Scraper
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python bot.py
+        
+      - name: Commit state
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add last_versions.json
+          git commit -m "Update version state" || exit 0
+          git push
