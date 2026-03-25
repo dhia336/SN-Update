@@ -80,7 +80,3 @@ Or set up a cron job for automatic monitoring:
 
 - **LiteAPK**: https://liteapks.com/download/stick-nodes-pro-101842
 - **5Play**: https://5play.org/en/10059-stick-nodes-pro-stickfigure-animator.html
-
-## License
-
-[Add your license here]
