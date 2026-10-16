@@ -2,6 +2,7 @@ name: Stick Nodes Tracker
 on:
   schedule:
     - cron: '0 0 */2 * *' # Runs every 2 days at midnight
+    - cron: '17 0 1 * *'   # Monthly keep-alive commit, on the 1st
   workflow_dispatch:      # Allows you to click "Run workflow" manually
 
 jobs:
@@ -12,6 +13,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      # Scheduled workflows can be disabled after 60 days without repository activity.
+      # Make one small commit monthly so the repository stays active.
+      - name: Keep repository active
+        if: github.event_name == 'schedule' && github.event.schedule == '17 0 1 * *'
+        run: |
+          date -u +%F > .github/heartbeat.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/heartbeat.txt
+          git commit -m "chore: scheduled keep-alive heartbeat"
+          git push
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
